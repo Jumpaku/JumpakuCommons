@@ -1,4 +1,4 @@
-package jumpaku.commons.test.util
+package jumpaku.commons.test.control
 
 import com.github.salomonbrys.kotson.int
 import com.github.salomonbrys.kotson.toJson
