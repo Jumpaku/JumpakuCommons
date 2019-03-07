@@ -28,7 +28,7 @@ private fun Matrix.toRealMatrix(): RealMatrix = when(this) {
     is Matrix.Identity -> DiagonalMatrix(DoubleArray(rowSize) { 1.0 })
     is Matrix.Diagonal -> DiagonalMatrix(data.toDoubleArray())
     is Matrix.Sparse -> OpenMapRealMatrix(rowSize, columnSize).apply {
-        this@toRealMatrix.data.forEach { (i, j), value -> setEntry(i, j, value) }
+        this@toRealMatrix.keyData.forEach { (i, j) -> setEntry(i, j, this@toRealMatrix[i, j]) }
     }
     is Matrix.Array2D -> MatrixUtils.createRealMatrix(toDoubleArrays())
 }
