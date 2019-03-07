@@ -1,0 +1,4 @@
+rootProject.name = 'JumpakuCommons'
+include 'commons', 'commons-test'
+
+

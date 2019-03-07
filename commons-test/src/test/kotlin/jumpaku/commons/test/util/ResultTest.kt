@@ -1,0 +1,167 @@
+package jumpaku.commons.test.util
+
+import jumpaku.commons.control.failure
+import jumpaku.commons.control.flatten
+import jumpaku.commons.control.success
+import jumpaku.commons.control.result
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.instanceOf
+import org.junit.Assert.assertThat
+import org.junit.Test
+
+class ResultTest {
+
+    val success = success(4)
+    val failure = failure<Int>(IllegalStateException("NG"))
+
+    @Test
+    fun testValue() {
+        println("Value")
+        assertThat(success.value().orNull()!!, `is`(4))
+        assertThat(failure.value().isEmpty, `is`(true))
+    }
+
+    @Test
+    fun testIsSuccess() {
+        println("IsSuccess")
+        assertThat(success.isSuccess, `is`(true))
+        assertThat(failure.isSuccess, `is`(false))
+    }
+
+    @Test
+    fun testIsFailure() {
+        println("IsFailure")
+        assertThat(success.isFailure, `is`(false))
+        assertThat(failure.isFailure, `is`(true))
+    }
+
+    @Test
+    fun testError() {
+        println("Error")
+        assertThat(success.error().isEmpty, `is`(true))
+        assertThat(failure.error().orNull()!!, `is`(instanceOf(IllegalStateException::class.java)))
+    }
+
+    @Test
+    fun testResult() {
+        println("Result")
+        val s = result { 4 }
+        assertThat(s.value().orNull()!!, `is`(4))
+        assertThat(s.error().isEmpty, `is`(true))
+        val f = result { throw Exception() }
+        assertThat(f.value().isEmpty, `is`(true))
+        assertThat(f.error().orNull()!!, `is`(instanceOf(Exception::class.java)))
+    }
+
+    @Test
+    fun testTryMap() {
+        println("TryMap")
+
+        val ss = success.tryMap { it.toString() }
+        assertThat(ss.value().orNull()!!, `is`("4"))
+        assertThat(ss.error().isEmpty, `is`(true))
+
+        val sf = success.tryMap { throw Exception() }
+        assertThat(sf.value().isEmpty, `is`(true))
+        assertThat(sf.error().orNull()!!, `is`(instanceOf(Exception::class.java)))
+
+        val fs = failure.tryMap { it.toString() }
+        assertThat(fs.value().isEmpty, `is`(true))
+        assertThat(fs.error().orNull()!!, `is`(instanceOf(IllegalStateException::class.java)))
+
+        val ff = failure.tryMap { throw Exception() }
+        assertThat(ff.value().isEmpty, `is`(true))
+        assertThat(ff.error().orNull()!!, `is`(instanceOf(IllegalStateException::class.java)))
+    }
+
+    @Test
+    fun testTryFlatMap() {
+        println("TryFlatMap")
+
+        val ss = success.tryFlatMap { result { it.toString() } }
+        assertThat(ss.value().orNull()!!, `is`("4"))
+        assertThat(ss.error().isEmpty, `is`(true))
+
+        val sf = success.tryFlatMap { result { throw Exception() } }
+        assertThat(sf.value().isEmpty, `is`(true))
+        assertThat(sf.error().orNull()!!, `is`(instanceOf(Exception::class.java)))
+
+        val fs = failure.tryFlatMap { result { it.toString() } }
+        assertThat(fs.value().isEmpty, `is`(true))
+        assertThat(fs.error().orNull()!!, `is`(instanceOf(IllegalStateException::class.java)))
+
+        val ff = failure.tryFlatMap { result { throw Exception() } }
+        assertThat(ff.value().isEmpty, `is`(true))
+        assertThat(ff.error().orNull()!!, `is`(instanceOf(IllegalStateException::class.java)))
+    }
+
+    @Test
+    fun testFlatten() {
+        println("Flatten")
+
+        val ss = result { success }.flatten()
+        assertThat(ss.value().orNull()!!, `is`(4))
+        assertThat(ss.error().isEmpty, `is`(true))
+
+        val sf = result { failure }.flatten()
+        assertThat(sf.value().isEmpty, `is`(true))
+        assertThat(sf.error().orNull()!!, `is`(instanceOf(IllegalStateException::class.java)))
+
+        val fs = result { success }.tryMap {
+            throw Exception()
+            @Suppress("UNREACHABLE_CODE") it
+        }.flatten()
+        assertThat(fs.value().isEmpty, `is`(true))
+        assertThat(fs.error().orNull()!!, `is`(instanceOf(Exception::class.java)))
+
+        val ff = result { failure }.tryMap {
+            throw Exception()
+            @Suppress("UNREACHABLE_CODE") it
+        }.flatten()
+        assertThat(ff.value().isEmpty, `is`(true))
+        assertThat(ff.error().orNull()!!, `is`(instanceOf(Exception::class.java)))
+    }
+
+    @Test
+    fun testTryRecover() {
+        println("TryRecover")
+
+        val ss = success.tryRecover { 5 }
+        assertThat(ss.value().orNull()!!, `is`(4))
+        assertThat(ss.error().isEmpty, `is`(true))
+
+        val sf = success.tryRecover { throw Exception() }
+        assertThat(sf.value().orNull()!!, `is`(4))
+        assertThat(sf.error().isEmpty, `is`(true))
+
+        val fs = failure.tryRecover { 5 }
+        assertThat(fs.value().orNull()!!, `is`(5))
+        assertThat(fs.error().isEmpty, `is`(true))
+
+        val ff = failure.tryRecover { throw Exception() }
+        assertThat(ff.value().isEmpty, `is`(true))
+        assertThat(ff.error().orNull()!!, `is`(instanceOf(Exception::class.java)))
+    }
+
+    @Test
+    fun testTryMapFailure() {
+        println("TryMapFailure")
+
+        val ss = success.tryMapFailure { Exception() }
+        assertThat(ss.value().orNull()!!, `is`(4))
+        assertThat(ss.error().isEmpty, `is`(true))
+
+        val sf = success.tryMapFailure { throw Exception() }
+        assertThat(sf.value().orNull()!!, `is`(4))
+        assertThat(sf.error().isEmpty, `is`(true))
+
+        val fs = failure.tryMapFailure { Exception() }
+        assertThat(fs.value().isEmpty, `is`(true))
+        assertThat(fs.error().orNull()!!, `is`(instanceOf(Exception::class.java)))
+
+        val ff = failure.tryMapFailure { throw Exception() }
+        assertThat(ff.value().isEmpty, `is`(true))
+        assertThat(ff.error().orNull()!!, `is`(instanceOf(Exception::class.java)))
+    }
+
+}
