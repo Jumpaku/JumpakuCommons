@@ -1,4 +1,4 @@
-package jumpaku.commons.test.util
+package jumpaku.commons.test.control
 
 import jumpaku.commons.control.failure
 import jumpaku.commons.control.flatten
