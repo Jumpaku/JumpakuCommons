@@ -154,7 +154,7 @@ private fun timesImpl(a: Matrix, b: Matrix): Matrix = when {
         val c = mutableMapOf<Matrix.Sparse.Key, MutableList<Double>>()
         // */mutableMapOf<Matrix.Sparse.Key, Double>()
         for ((i, k) in a.data.keys) {
-            for ((j, bKey) in b.columnKeys) {
+            for ((j, bColumnKey) in b.columnKeys) {
                 if (Matrix.Sparse.Key(k, j) in bKey) {
                     val key = Matrix.Sparse.Key(i, j)
                     c.compute(key) { _, arr -> (arr ?: ArrayList(a.rowSize)).apply { add(a[i, k] * b[k, j]) } }
