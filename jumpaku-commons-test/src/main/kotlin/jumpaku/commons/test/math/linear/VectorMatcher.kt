@@ -1,4 +1,4 @@
-package jumpaku.commons.test.linear
+package jumpaku.commons.test.math.linear
 
 import jumpaku.commons.math.linear.Vector
 import jumpaku.commons.test.isCloseTo

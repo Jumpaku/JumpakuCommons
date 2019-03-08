@@ -3,7 +3,12 @@ package jumpaku.commons.math
 import jumpaku.commons.control.Result
 import jumpaku.commons.control.result
 import org.apache.commons.math3.analysis.solvers.BrentSolver
+import org.apache.commons.math3.util.MathArrays
 
+
+internal fun Double.lerp(t: Double, other: Double): Double = MathArrays.linearCombination(1 - t, this, t, other)
+
+internal fun Double.middle(other: Double): Double = lerp(0.5, other)
 
 class Solver {
 

@@ -2,8 +2,7 @@ package jumpaku.commons.test.math.linear
 
 import jumpaku.commons.math.linear.Matrix
 import jumpaku.commons.math.linear.Vector
-import jumpaku.commons.test.closeTo
-import jumpaku.commons.test.linear.closeTo
+import jumpaku.commons.test.math.closeTo
 import org.hamcrest.Matchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test

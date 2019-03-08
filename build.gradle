@@ -1,6 +1,6 @@
 
 buildscript {
-    ext.jumpaku_commons_version = '0.2'
+    ext.jumpaku_commons_version = '0.3'
     ext.kotlin_version = '1.3.21'
     ext.jvm_version = '1.8'
     ext.dokka_version = '0.9.17'
