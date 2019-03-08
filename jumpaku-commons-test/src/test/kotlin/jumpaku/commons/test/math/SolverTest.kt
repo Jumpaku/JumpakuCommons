@@ -1,7 +1,7 @@
 package jumpaku.commons.test.math
 
 import jumpaku.commons.math.Solver
-import jumpaku.commons.test.closeTo
+import jumpaku.commons.test.math.isCloseTo
 import org.hamcrest.Matchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
