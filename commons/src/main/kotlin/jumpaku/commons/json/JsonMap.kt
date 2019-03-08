@@ -11,6 +11,6 @@ import com.google.gson.JsonElement
 fun <K : JsonElement, V: JsonElement, M : Map<K, V>> jsonMap(map: M): JsonArray =
         jsonArray(map.map { (key, value) -> jsonObject("key" to key, "value" to value) })
 
-val JsonElement.map: Map<JsonElement, JsonElement> get() = array.map { Pair(it["key"], it["value"]) }.toMap()
+val JsonElement.map: Map<JsonElement, JsonElement> get() = array.map { it["key"] to it["value"] }.toMap()
 
 

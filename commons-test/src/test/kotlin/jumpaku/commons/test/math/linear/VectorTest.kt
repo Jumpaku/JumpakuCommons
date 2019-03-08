@@ -1,6 +1,5 @@
 package jumpaku.commons.test.math.linear
 
-import jumpaku.commons.json.parseJson
 import jumpaku.commons.math.linear.Matrix
 import jumpaku.commons.math.linear.Vector
 import jumpaku.commons.math.linear.times
@@ -11,19 +10,20 @@ import org.junit.Assert.assertThat
 import org.junit.Test
 import kotlin.math.sqrt
 
+
 class VectorTest {
 
     val dataX = listOf(-1.0, 0.0, 2.0, 0.0, -3.0, 0.0, 4.0)
     val dataY = listOf(3.0, -2.0, 1.0, 5.0, 3.0, -4.0, 0.0)
-    val sX = Vector.Sparse(7, dataX.mapIndexedNotNull { i, v -> v.takeIf { it != 0.0 }?.let { i to v } }.toMap())
-    val sY = Vector.Sparse(7, dataY.mapIndexedNotNull { i, v -> v.takeIf { it != 0.0 }?.let { i to v } }.toMap())
-    val aX = Vector.Array(dataX)
-    val aY = Vector.Array(dataY)
+    val sX = Vector.of(7, dataX.mapIndexedNotNull { i, v -> v.takeIf { it != 0.0 }?.let { i to v } }.toMap())
+    val sY = Vector.of(7, dataY.mapIndexedNotNull { i, v -> v.takeIf { it != 0.0 }?.let { i to v } }.toMap())
+    val aX = Vector.of(dataX)
+    val aY = Vector.of(dataY)
 
     @Test
     fun testMap() {
         fun f(v: Double): Double = 5.0
-        val e = Vector.Array(List(7) { 5.0 })
+        val e = Vector.of(List(7) { 5.0 })
         assertThat(sX.map(::f), `is`(closeTo(e)))
         assertThat(aX.map(::f), `is`(closeTo(e)))
     }
@@ -31,7 +31,7 @@ class VectorTest {
     @Test
     fun testMapIndexed() {
         fun f(i: Int, v: Double): Double = i.toDouble()
-        val e = Vector.Array(List(7) { it.toDouble() })
+        val e = Vector.of(List(7) { it.toDouble() })
         assertThat(sX.mapIndexed(::f), `is`(closeTo(e)))
         assertThat(aX.mapIndexed(::f), `is`(closeTo(e)))
     }
@@ -39,7 +39,7 @@ class VectorTest {
     @Test
     fun testTimes() {
         val c = -3.0
-        val e = Vector.Array(listOf(3.0, 0.0, -6.0, 0.0, 9.0, 0.0, -12.0))
+        val e = Vector.of(listOf(3.0, 0.0, -6.0, 0.0, 9.0, 0.0, -12.0))
         assertThat(c*sX, `is`(closeTo(e)))
         assertThat(c*aX, `is`(closeTo(e)))
         assertThat(sX*c, `is`(closeTo(e)))
@@ -49,7 +49,7 @@ class VectorTest {
     @Test
     fun testDiv() {
         val c = -2.0
-        val e = Vector.Array(listOf(0.5, 0.0, -1.0, 0.0, 1.5, 0.0, -2.0))
+        val e = Vector.of(listOf(0.5, 0.0, -1.0, 0.0, 1.5, 0.0, -2.0))
         assertThat((sX/c).orThrow(), `is`(closeTo(e)))
         assertThat((aX/c).orThrow(), `is`(closeTo(e)))
     }
@@ -62,13 +62,13 @@ class VectorTest {
 
     @Test
     fun testUnaryMinus() {
-        assertThat(-sX, `is`(closeTo(-1.0 * sX)))
-        assertThat(-aX, `is`(closeTo(-1.0 * aX)))
+        assertThat(-sX, `is`(closeTo(-1.0*sX)))
+        assertThat(-aX, `is`(closeTo(-1.0*aX)))
     }
 
     @Test
     fun testPlus() {
-        val e = Vector.Array(listOf(2.0, -2.0, 3.0, 5.0, 0.0, -4.0, 4.0))
+        val e = Vector.of(listOf(2.0, -2.0, 3.0, 5.0, 0.0, -4.0, 4.0))
         assertThat(sX + sY, `is`(closeTo(e)))
         assertThat(aX + sY, `is`(closeTo(e)))
         assertThat(sX + aY, `is`(closeTo(e)))
@@ -77,7 +77,7 @@ class VectorTest {
 
     @Test
     fun testMinus() {
-        val e = Vector.Array(listOf(-4.0, 2.0, 1.0, -5.0, -6.0, 4.0, 4.0))
+        val e = Vector.of(listOf(-4.0, 2.0, 1.0, -5.0, -6.0, 4.0, 4.0))
         assertThat(sX - sY, `is`(closeTo(e)))
         assertThat(aX - sY, `is`(closeTo(e)))
         assertThat(sX - aY, `is`(closeTo(e)))
@@ -118,8 +118,6 @@ class VectorTest {
 
     @Test
     fun testDist() {
-        val dataX = listOf(-1.0, 0.0, 2.0, 0.0, -3.0, 0.0, 4.0)
-        val dataY = listOf(3.0, -2.0, 1.0, 5.0, 3.0, -4.0, 0.0)
         val e = sqrt(114.0)
         assertThat(sX.dist(sY), `is`(closeTo(e)))
         assertThat(aX.dist(sY), `is`(closeTo(e)))
@@ -129,21 +127,21 @@ class VectorTest {
 
     @Test
     fun testNormalize() {
-        val e = Vector.Array(listOf(-1.0/sqrt(30.0), 0.0, 2.0/sqrt(30.0), 0.0, -3.0/sqrt(30.0), 0.0, 4.0/sqrt(30.0)))
+        val e = Vector.of(listOf(-1.0/sqrt(30.0), 0.0, 2.0/sqrt(30.0), 0.0, -3.0/sqrt(30.0), 0.0, 4.0/sqrt(30.0)))
         assertThat(sX.normalize().orThrow(), `is`(closeTo(e)))
         assertThat(aX.normalize().orThrow(), `is`(closeTo(e)))
     }
 
     @Test
     fun testAsRow() {
-        val e = Matrix.Array2D(listOf(dataX))
+        val e = Matrix.of(listOf(dataX))
         assertThat(sX.asRow(), `is`(closeTo(e)))
         assertThat(aX.asRow(), `is`(closeTo(e)))
     }
 
     @Test
     fun testAsColumn() {
-        val e = Matrix.Array2D(dataX.map(::listOf))
+        val e = Matrix.of(dataX.map(::listOf))
         assertThat(sX.asColumn(), `is`(closeTo(e)))
         assertThat(aX.asColumn(), `is`(closeTo(e)))
     }
@@ -168,13 +166,4 @@ class VectorTest {
         assertThat(a_aX[5], `is`(closeTo(e[5])))
         assertThat(a_aX[6], `is`(closeTo(e[6])))
     }
-
-    @Test
-    fun testToString() {
-        val a_sX = sX.toString().parseJson().tryMap { Vector.fromJson(it) }.orThrow()
-        assertThat(a_sX, `is`(closeTo(sX)))
-        val a_aX = aX.toString().parseJson().tryMap { Vector.fromJson(it) }.orThrow()
-        assertThat(a_aX, `is`(closeTo(aX)))
-    }
-
 }

@@ -10,7 +10,8 @@ class Solver {
     fun solve(
         interval: ClosedRange<Double>,
         initial: Double = interval.run { start.middle(endInclusive) },
-        function: (Double) -> Double): Result<Double> {
+        function: (Double) -> Double
+    ): Result<Double> {
         require(initial in interval) { "initial value($initial) out of interval($interval)" }
         fun f(x: Double): Double = function(interval.run { start.lerp(x, endInclusive).coerceIn(interval) })
         val x0 = interval.run { ((initial - start) / (endInclusive - start)).coerceIn(0.0..1.0) }

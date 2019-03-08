@@ -17,20 +17,15 @@ sealed class Option<out T: Any>: Iterable<T> {
 
     fun orThrow(except: ()->Exception = { NoSuchElementException("None.orThrow()") }): T = orNull() ?: throw except()
 
-    fun <U: Any> map(transform: (T) -> U): Option<U> = flatMap {
-        Some(
-            transform(it)
-        )
-    }
+    fun <U: Any> map(transform: (T) -> U): Option<U> = flatMap { Some(transform(it)) }
 
     fun <U: Any> flatMap(transform: (T) -> Option<U>): Option<U> = (this as? Some)?.let { transform(value) } ?: None
 
     fun filter(test: (T)->Boolean): Option<T> = if (this is Some && test(value)) this else None
 
-    fun forEach(actionIfPresent: (T)->Unit, actionIfAbsent: ()->Unit): Unit = when(this) {
-        is Some -> actionIfPresent(value)
-        is None -> actionIfAbsent()
-    }
+    fun ifPresent(action: (T) -> Unit): Option<T> = apply { forEach(action) }
+
+    fun ifAbsent(action: () -> Unit): Option<T> = apply { if (this is None) action() }
 
     companion object {
 
@@ -38,9 +33,7 @@ sealed class Option<out T: Any>: Iterable<T> {
             if ("value" in (json as JsonObject) && !json["value"].isJsonNull) some(json["value"])
             else none()
 
-        fun <T: Any> fromJson(json: JsonElement, transform: (JsonElement) -> T): Option<T> = fromJson(
-            json
-        ).map(transform)
+        fun <T: Any> fromJson(json: JsonElement, transform: (JsonElement) -> T): Option<T> = fromJson(json).map(transform)
     }
 }
 
@@ -96,6 +89,4 @@ fun <T: Any> option(nullable: ()->T?): Option<T> = nullable()?.let(::some) ?: no
 
 fun <T: Any> T?.toOption(): Option<T> = option { this }
 
-fun <T: Any> optionWhen(condition: Boolean, supply: () -> T): Option<T> = if (condition) some(
-    supply()
-) else none()
+fun <T: Any> optionWhen(condition: Boolean, supply: () -> T): Option<T> = if (condition) some(supply()) else none()
