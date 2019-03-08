@@ -97,13 +97,13 @@ subprojects {
     }
 }
 
-project(':commons') {
+project(':jumpaku-commons') {
 }
 
-project(':commons-test') {
+project(':jumpaku-commons-test') {
 
     dependencies {
-        compile project(':commons')
+        compile project(':jumpaku-commons')
         compile "org.hamcrest:hamcrest:${dependencyVersions.hamcrest}"
 
         testCompileOnly "junit:junit:${dependencyVersions.junit4}"
