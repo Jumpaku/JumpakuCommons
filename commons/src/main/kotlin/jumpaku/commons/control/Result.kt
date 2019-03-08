@@ -1,5 +1,6 @@
 package jumpaku.commons.control
 
+
 sealed class Result<V: Any> {
 
     fun value(): Option<V> = if (this is Success) some(value) else none()
@@ -10,16 +11,12 @@ sealed class Result<V: Any> {
 
     val isFailure: Boolean get() = this is Failure
 
-    fun <U: Any> tryMap(transform: (V) -> U): Result<U> = tryFlatMap {
-        result {
-            transform(
-                it
-            )
-        }
-    }
+    fun <U : Any> tryMap(transform: (V) -> U): Result<U> = tryFlatMap { result { transform(it) } }
 
-    fun <U: Any> tryFlatMap(transform: (V) -> Result<U>): Result<U> = when (this) {
-        is Success -> try { transform(value) } catch (e: Exception) {
+    fun <U : Any> tryFlatMap(transform: (V) -> Result<U>): Result<U> = when (this) {
+        is Success -> try {
+            transform(value)
+        } catch (e: Exception) {
             Failure<U>(e)
         }
         is Failure -> Failure(error)
@@ -45,6 +42,10 @@ sealed class Result<V: Any> {
         is Success -> value
         is Failure -> throw error
     }
+
+    fun onSuccess(action: (V) -> Unit): Result<V> = apply { value().forEach(action) }
+
+    fun onFailure(action: (Exception) -> Unit) = apply { error().forEach(action) }
 }
 
 class Success<V: Any>(val value: V) : Result<V>() {
@@ -59,13 +60,8 @@ class Failure<V: Any>(val error: Exception) : Result<V>() {
 
 fun <T: Any> Result<Result<T>>.flatten(): Result<T> = tryFlatMap { it }
 
-fun <T: Any> result(tryCompute: () -> T): Result<T> = try {
-    Success(tryCompute())
-} catch (e: Exception) {
-    Failure(e)
-}
+fun <T: Any> result(tryCompute: () -> T): Result<T> = try { Success(tryCompute()) } catch (e: Exception) { Failure(e) }
 
 fun <V: Any> success(value: V): Result<V> = Success(value)
 
-fun <V: Any> failure(exception: Exception): Result<V> =
-    Failure(exception)
+fun <V: Any> failure(exception: Exception): Result<V> = Failure(exception)

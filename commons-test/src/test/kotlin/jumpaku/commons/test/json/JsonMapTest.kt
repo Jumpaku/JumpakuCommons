@@ -20,8 +20,8 @@ class JsonMapKtTest {
     }
 
     @Test
-    fun testMapJson() {
-        println("MapJson")
+    fun testJsonMap() {
+        println("JsonMap")
         val str2int = mapOf("A" to 1, "B" to 2, "C" to 3)
         val ssi = jsonMap(str2int.map { (k, v) -> k.toJson() to v.toJson() }.toMap()).toString()
         val dsi = ssi.parseJson().orThrow().map.map { (k, v) -> Pair(k.string, v.int) }.toMap()
