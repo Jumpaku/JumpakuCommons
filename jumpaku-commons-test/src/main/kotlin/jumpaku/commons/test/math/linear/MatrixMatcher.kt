@@ -1,7 +1,7 @@
 package jumpaku.commons.test.math.linear
 
 import jumpaku.commons.math.linear.Matrix
-import jumpaku.commons.test.isCloseTo
+import jumpaku.commons.test.math.isCloseTo
 import jumpaku.commons.test.matcher
 import org.hamcrest.TypeSafeMatcher
 
