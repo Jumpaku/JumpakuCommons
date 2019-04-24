@@ -3,6 +3,7 @@ package jumpaku.commons.test.control
 import com.github.salomonbrys.kotson.int
 import com.github.salomonbrys.kotson.toJson
 import jumpaku.commons.control.*
+import jumpaku.commons.json.parseJson
 import jumpaku.commons.math.isEven
 import jumpaku.commons.math.isOdd
 import org.hamcrest.Matchers.*
@@ -32,6 +33,22 @@ class OptionTest {
         val n: Int? = null
         assertThat(s.toOption().isDefined, `is`(true))
         assertThat(n.toOption().isEmpty, `is`(true))
+    }
+
+    @Test
+    fun testSomeIf() {
+        println("SomeIf")
+        val s = 5
+        assertThat(s.someIf(Int::isEven) { 0 }.isEmpty, `is`(true))
+        assertThat(s.someIf(Int::isOdd) { 0 }.orThrow(), `is`(0))
+    }
+
+    @Test
+    fun testSomeUnless() {
+        println("SomeUnless")
+        val s = 5
+        assertThat(s.someUnless(Int::isOdd) { 0 }.isEmpty, `is`(true))
+        assertThat(s.someUnless(Int::isEven) { 0 }.orThrow(), `is`(0))
     }
 
     @Test
@@ -147,6 +164,14 @@ class OptionTest {
         assertThat(Option.fromJson(none.map { it.toJson() }.toJson()).map { it.int }.orNull(), `is`(nullValue()))
     }
 
+
+    @Test
+    fun testToJsonString() {
+        println("ToJsonString")
+        assertThat(Option.fromJson(some.map { it.toJson() }.toJsonString().parseJson().orThrow()).map { it.int }.orNull()!!, `is`(4))
+        assertThat(Option.fromJson(none.map { it.toJson() }.toJsonString().parseJson().orThrow()).map { it.int }.orNull(), `is`(nullValue()))
+    }
+
     @Test
     fun testToResult() {
         println("ToResult")
@@ -154,5 +179,22 @@ class OptionTest {
         assertThat(some.toResult().error().isEmpty, `is`(true))
         assertThat(none.toResult().value().isEmpty, `is`(true))
         assertThat(none.toResult().error().orNull()!!, `is`(instanceOf(NoSuchElementException::class.java)))
+    }
+
+    @Test
+    fun testEquals() {
+        println("Equals")
+        assertThat(some == some(4), `is`(true))
+        assertThat(some == some(5), `is`(false))
+        assertThat(some == none, `is`(false))
+        assertThat(none == some(4), `is`(false))
+        assertThat(none == none<Int>(), `is`(true))
+    }
+
+    @Test
+    fun testHashCode() {
+        println("HashCode")
+        assertThat(some.hashCode() == some(4).hashCode(), `is`(true))
+        assertThat(none.hashCode() == none<Int>().hashCode(), `is`(true))
     }
 }
