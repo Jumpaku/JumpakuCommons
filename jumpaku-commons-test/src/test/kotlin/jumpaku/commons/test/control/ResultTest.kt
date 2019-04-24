@@ -23,6 +23,13 @@ class ResultTest {
     }
 
     @Test
+    fun testOrRecover() {
+        println("OrRecover")
+        assertThat(success.orRecover { 0 }, `is`(4))
+        assertThat(failure.orRecover { 0 }, `is`(0))
+    }
+
+    @Test
     fun testIsSuccess() {
         println("IsSuccess")
         assertThat(success.isSuccess, `is`(true))
