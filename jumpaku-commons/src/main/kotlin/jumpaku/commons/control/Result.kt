@@ -11,9 +11,9 @@ sealed class Result<V: Any> {
 
     val isFailure: Boolean get() = this is Failure
 
-    fun <U : Any> tryMap(transform: (V) -> U): Result<U> = tryFlatMap { result { transform(it) } }
+    inline fun <U : Any> tryMap(transform: (V) -> U): Result<U> = tryFlatMap { result { transform(it) } }
 
-    fun <U : Any> tryFlatMap(transform: (V) -> Result<U>): Result<U> = when (this) {
+    inline fun <U : Any> tryFlatMap(transform: (V) -> Result<U>): Result<U> = when (this) {
         is Success -> try {
             transform(value)
         } catch (e: Exception) {
@@ -22,12 +22,12 @@ sealed class Result<V: Any> {
         is Failure -> Failure(error)
     }
 
-    fun tryRecover(recovery: (Exception) -> V): Result<V> = when (this) {
+    inline fun tryRecover(recovery: (Exception) -> V): Result<V> = when (this) {
         is Success -> this
         is Failure -> result { recovery(error) }
     }
 
-    fun tryMapFailure(transform: (Exception) -> Exception): Result<V> = when (this) {
+    inline fun tryMapFailure(transform: (Exception) -> Exception): Result<V> = when (this) {
         is Success -> this
         is Failure -> Failure(
             try {
@@ -43,9 +43,13 @@ sealed class Result<V: Any> {
         is Failure -> throw error
     }
 
-    fun onSuccess(action: (V) -> Unit): Result<V> = apply { value().forEach(action) }
+    inline fun orRecover(recovery: (Exception) -> V): V = tryRecover(recovery).orThrow()
 
-    fun onFailure(action: (Exception) -> Unit) = apply { error().forEach(action) }
+    inline fun onSuccess(action: (V) -> Unit): Result<V> = apply { value().forEach(action) }
+
+    inline fun onFailure(action: (Exception) -> Unit) = apply { error().forEach(action) }
+
+
 }
 
 class Success<V: Any>(val value: V) : Result<V>() {
@@ -60,7 +64,7 @@ class Failure<V: Any>(val error: Exception) : Result<V>() {
 
 fun <T: Any> Result<Result<T>>.flatten(): Result<T> = tryFlatMap { it }
 
-fun <T: Any> result(tryCompute: () -> T): Result<T> = try { Success(tryCompute()) } catch (e: Exception) { Failure(e) }
+inline fun <T: Any> result(tryCompute: () -> T): Result<T> = try { Success(tryCompute()) } catch (e: Exception) { Failure(e) }
 
 fun <V: Any> success(value: V): Result<V> = Success(value)
 
