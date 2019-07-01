@@ -110,6 +110,15 @@ class OptionTest {
     }
 
     @Test
+    fun testFlatten() {
+        println("Flatten")
+        assertThat(Some(some).flatten().orNull()!!, `is`(4))
+        assertThat(Some(none).flatten().orNull(), `is`(nullValue()))
+        assertThat(none.map { some(it) }.flatten().orNull(), `is`(nullValue()))
+        assertThat(none.map { none }.flatten().orNull(), `is`(nullValue()))
+    }
+
+    @Test
     fun testFilter() {
         println("Filter")
         assertThat(some.filter { it.isEven() }.orNull()!!, `is`(4))
@@ -196,5 +205,21 @@ class OptionTest {
         println("HashCode")
         assertThat(some.hashCode() == some(4).hashCode(), `is`(true))
         assertThat(none.hashCode() == none<Int>().hashCode(), `is`(true))
+    }
+
+    @Test
+    fun testOr() {
+        assertThat((some or Some(5)).orNull()!!, `is`(4))
+        assertThat((some or None).orNull()!!, `is`(4))
+        assertThat((None or some).orNull(), `is`(4))
+        assertThat((None or None).orNull(), `is`(nullValue()))
+    }
+
+    @Test
+    fun testAnd() {
+        assertThat((some and Some(5)).orNull()!!, `is`(5))
+        assertThat((some and None).orNull(), `is`(nullValue()))
+        assertThat((None and some).orNull(), `is`(nullValue()))
+        assertThat((None and None).orNull(), `is`(nullValue()))
     }
 }
