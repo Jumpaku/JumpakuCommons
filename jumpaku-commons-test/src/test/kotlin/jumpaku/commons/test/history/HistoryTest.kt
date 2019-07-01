@@ -59,5 +59,7 @@ class HistoryTest {
 
         val e2 = e.undo().undo().undo().undo().redo().redo().undo().redo().redo().redo()
         assertThat(e2.current.orNull(), `is`(3))
+        val e3 = e.redo().redo().redo().undo().undo().undo().undo().redo().redo().undo()
+        assertThat(e3.current.orNull(), `is`(1))
     }
 }
