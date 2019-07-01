@@ -196,3 +196,5 @@ gradle-app.setting
 
 
 \.idea/*
+
+*.iml
