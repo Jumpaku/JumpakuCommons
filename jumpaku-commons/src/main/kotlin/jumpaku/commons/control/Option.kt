@@ -16,7 +16,7 @@ sealed class Option<out T: Any>: Iterable<T> {
 
     fun orNull(): T? = (this as? Some)?.value
 
-    fun orThrow(except: ()->Exception = { NoSuchElementException("None.orThrow()") }): T = orNull() ?: throw except()
+    fun orThrow(except: () -> Exception = { NoSuchElementException("None.orThrow()") }): T = orNull() ?: throw except()
 
     inline fun <U: Any> map(transform: (T) -> U): Option<U> = flatMap { Some(transform(it)) }
 
@@ -87,6 +87,10 @@ fun <T: Any> Option<Option<T>>.flatten(): Option<T> = flatMap { it }
 inline fun <T: Any> Option<T>.orDefault(default: () -> T): T = orNull() ?: default()
 fun <T: Any> Option<T>.orDefault(default: T): T = orNull() ?: default
 
+infix fun <T: Any> Option<T>.or(other: Option<T>): Option<T> = ifAbsent { return other }
+
+infix fun <T: Any> Option<T>.and(other: Option<T>): Option<T> = ifPresent { return other }
+
 inline fun <T: Any> Option<T>.toResult(except: () -> Exception = { NoSuchElementException("None.orThrow()") }): Result<T> =
     result { (this as? Some)?.value ?: throw except() }
 
@@ -103,7 +107,3 @@ inline fun <T: Any> optionWhen(condition: Boolean, supply: () -> T): Option<T> =
 inline fun <T: Any> T.someIf(condition: T.() -> Boolean, supply: T.() -> T = { this }): Option<T> = if(condition()) some(supply()) else none()
 inline fun <T: Any> T.someUnless(condition: T.() -> Boolean, supply: T.() -> T = { this }): Option<T> = someIf({ !condition() }, supply)
 
-
-fun main() {
-    runCatching {  }.isFailure
-}

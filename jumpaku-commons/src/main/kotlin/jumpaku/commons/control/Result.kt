@@ -48,8 +48,6 @@ sealed class Result<V: Any> {
     inline fun onSuccess(action: (V) -> Unit): Result<V> = apply { value().forEach(action) }
 
     inline fun onFailure(action: (Exception) -> Unit) = apply { error().forEach(action) }
-
-
 }
 
 class Success<V: Any>(val value: V) : Result<V>() {
@@ -64,7 +62,11 @@ class Failure<V: Any>(val error: Exception) : Result<V>() {
 
 fun <T: Any> Result<Result<T>>.flatten(): Result<T> = tryFlatMap { it }
 
-inline fun <T: Any> result(tryCompute: () -> T): Result<T> = try { Success(tryCompute()) } catch (e: Exception) { Failure(e) }
+inline fun <T: Any> result(tryCompute: () -> T): Result<T> = try {
+    Success(tryCompute())
+} catch (e: Exception) {
+    Failure(e)
+}
 
 fun <V: Any> success(value: V): Result<V> = Success(value)
 

@@ -1,7 +1,7 @@
 
 buildscript {
     ext.jumpaku_commons_version = '1.0.0'
-    ext.kotlin_version = '1.3.21'
+    ext.kotlin_version = '1.3.40'
     ext.jvm_version = '1.8'
     ext.dokka_version = '0.9.17'
     ext.dependencyVersions = [
@@ -57,11 +57,11 @@ subprojects {
 
     // Documentation
     task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
+        archiveClassifier = 'sources'
         from sourceSets.main.allSource
     }
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
         from javadoc.destinationDir
     }
     artifacts {
