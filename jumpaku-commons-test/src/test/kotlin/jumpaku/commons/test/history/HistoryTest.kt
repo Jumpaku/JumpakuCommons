@@ -2,6 +2,7 @@ package jumpaku.commons.test.history
 
 import jumpaku.commons.control.Option
 import jumpaku.commons.control.orDefault
+import jumpaku.commons.history.Command
 import jumpaku.commons.history.History
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.nullValue
@@ -9,10 +10,36 @@ import org.junit.Assert.assertThat
 import org.junit.Test
 
 class HistoryTest {
-    val update: (Option<Int>) -> Int = { it.map { it + 1 }.orDefault(1) }
+    object Action: (Option<Int>) -> Int {
+        override fun invoke(p1: Option<Int>): Int =p1.map { it + 1 }.orDefault(1)
+    }
+    val redo: Command<Int, Action> = Command.Redo()
+    val undo: Command<Int, Action> = Command.Undo()
+    val update: Command<Int, Action> = Command.Do(Action)
 
-    val h = History<Int>()
+    val h = History<Int, Action>()
 
+    @Test
+    fun testReproduce() {
+        println("Reproduce")
+        val e = h
+            .exec(update)
+            .exec(update)
+            .exec(update)
+            .redo()
+            .redo()
+            .redo()
+            .undo()
+            .undo()
+            .undo()
+            .undo()
+            .redo()
+            .redo()
+            .undo()
+            .exec(update)
+        val a = History.reproduce(e.commands)
+        assertThat(a.current.orThrow(), `is`(e.current.orThrow()))
+    }
     @Test
     fun testExec() {
         println("Exec")
@@ -20,8 +47,34 @@ class HistoryTest {
         assertThat(e0.current.orNull(), `is`(1))
         val e1 = h.exec(update).exec(update)
         assertThat(e1.current.orNull(), `is`(2))
+
+        val e2 = h.exec(undo)
+        assertThat(e2.current.orNull(), `is`(nullValue()))
+        val e3 = h.exec(update).exec(update).exec(undo)
+        assertThat(e3.current.orNull(), `is`(1))
+        val e4 = h.exec(update).exec(update).exec(update).exec(undo).exec(undo)
+        assertThat(e4.current.orNull(), `is`(1))
+
+        val e5 = h.redo()
+        assertThat(e5.current.orNull(), `is`(nullValue()))
+        val e6 = h.exec(update).exec(redo)
+        assertThat(e6.current.orNull(), `is`(1))
+        val e7 = h.exec(update).exec(undo).exec(redo)
+        assertThat(e7.current.orNull(), `is`(1))
+        val e8 = h.exec(update).exec(update).exec(undo).exec(undo).exec(redo)
+        assertThat(e8.current.orNull(), `is`(1))
+        val e9 = h.exec(update).exec(update).exec(undo).exec(undo).exec(redo).exec(redo)
+        assertThat(e9.current.orNull(), `is`(2))
     }
 
+    @Test
+    fun testDoAction() {
+        println("DoAction")
+        val e0 = h.doAction(Action)
+        assertThat(e0.current.orNull(), `is`(1))
+        val e1 = h.doAction(Action).doAction(Action)
+        assertThat(e1.current.orNull(), `is`(2))
+    }
     @Test
     fun testUndo() {
         println("Undo")
@@ -49,8 +102,8 @@ class HistoryTest {
     }
 
     @Test
-    fun testRedoUndo() {
-        println("Redo")
+    fun testCombinations() {
+        println("Combinations")
         val e = h.exec(update).exec(update).exec(update)
         val e0 = e.undo()
         assertThat(e0.current.orNull(), `is`(2))
@@ -62,4 +115,6 @@ class HistoryTest {
         val e3 = e.redo().redo().redo().undo().undo().undo().undo().redo().redo().undo()
         assertThat(e3.current.orNull(), `is`(1))
     }
+
+
 }
