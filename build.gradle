@@ -1,19 +1,11 @@
 buildscript {
+    ext.jumpaku_commons_version = "2.0.0-alpha-1-SNAPSHOT"
     ext.kotlin_version = "1.3.72"
     ext.jvm_version = "1.8"
     ext.junit4_version = "4.12"
     ext.hamcrest_version = "2.1"
     ext.commons_math3_version = "3.6.1"
     ext.kotson_version = "2.5.0"
-
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
-    }
 }
 
 plugins {
@@ -35,7 +27,7 @@ allprojects {
     apply(plugin: "maven-publish")
 
     group = "jumpaku"
-    version = "2.0.0-alpha-SNAPSHOT"
+    version = jumpaku_commons_version
 
     repositories {
         mavenCentral()
@@ -51,7 +43,7 @@ allprojects {
 
     dependencies {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-        if (name.endsWith("test")){
+        if (name.endsWith("test")) {
             implementation("org.hamcrest:hamcrest:$hamcrest_version")
             implementation("junit:junit:$junit4_version")
         }
@@ -63,14 +55,23 @@ allprojects {
      */
     publishing {
         def (repositoryUsername, repositoryPassword) = (project?.findProperty("args") as String)?.split(/\s+/) ?: []
-        def repositoryUrl = "https://nexus.jumpaku.net/repository/" +
-                ((version.endsWith("SNAPSHOT")) ? "maven-snapshots" : "maven-releases")
         repositories {
             maven {
-                url = uri(repositoryUrl)
+                name = "snapshotRepo"
+                url = uri("https://nexus.jumpaku.net/repository/maven-snapshots")
                 credentials {
                     username = repositoryUsername ?: "UNKOWN"
                     password = repositoryPassword ?: "UNKOWN"
+                }
+            }
+            if (!version.endsWith("SNAPSHOT")) {
+                maven {
+                    name = "releaseRepo"
+                    url = uri("https://nexus.jumpaku.net/repository/maven-releases")
+                    credentials {
+                        username = repositoryUsername ?: "UNKOWN"
+                        password = repositoryPassword ?: "UNKOWN"
+                    }
                 }
             }
         }
@@ -78,7 +79,6 @@ allprojects {
         publications {
             create("release", MavenPublication) {
                 from(components["kotlin"])
-
             }
         }
     }
