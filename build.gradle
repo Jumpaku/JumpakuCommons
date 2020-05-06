@@ -21,6 +21,13 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "$kotlin_version"
 }
 
+
+dependencies {
+    api(project(":jumpaku-commons-control"))
+    api(project(":jumpaku-commons-history"))
+    api(project(":jumpaku-commons-json"))
+}
+
 // Common configuration
 allprojects {
 
@@ -44,15 +51,15 @@ allprojects {
 
     dependencies {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-        api("org.apache.commons:commons-math3:$commons_math3_version")
-        api("com.github.salomonbrys.kotson:kotson:$kotson_version")
+        if (name.endsWith("test")){
+            implementation("org.hamcrest:hamcrest:$hamcrest_version")
+            implementation("junit:junit:$junit4_version")
+        }
     }
-
 
     // Publishing
     /**
-     * To run uploadArchives,  ./gradlew publish -Pargs="`user id of nexus.jumpaku.net` `password`"
+     * To run publish,  ./gradlew publish -Pargs="`user id of nexus.jumpaku.net` `password`"
      */
     publishing {
         def (repositoryUsername, repositoryPassword) = (project?.findProperty("args") as String)?.split(/\s+/) ?: []
@@ -67,22 +74,64 @@ allprojects {
                 }
             }
         }
+
         publications {
             create("release", MavenPublication) {
                 from(components["kotlin"])
+
             }
         }
     }
 }
 
-project(":jumpaku-commons") {
+
+project(":jumpaku-commons-matcher") {
+    dependencies {
+        api("org.hamcrest:hamcrest:$hamcrest_version")
+        api("junit:junit:$junit4_version")
+    }
+}
+project(":jumpaku-commons-control") {
+}
+project(":jumpaku-commons-control-test") {
+    dependencies {
+        implementation(project(":jumpaku-commons-control"))
+    }
 }
 
-project(":jumpaku-commons-test") {
-
+project(":jumpaku-commons-history") {
     dependencies {
-        implementation(project(":jumpaku-commons"))
-        implementation("org.hamcrest:hamcrest:$hamcrest_version")
-        implementation("junit:junit:$junit4_version")
+        api(project(":jumpaku-commons-control"))
+    }
+}
+project(":jumpaku-commons-history-test") {
+    dependencies {
+        implementation(project(":jumpaku-commons-control"))
+        implementation(project(":jumpaku-commons-history"))
+    }
+}
+
+project(":jumpaku-commons-json") {
+    dependencies {
+        api(project(":jumpaku-commons-control"))
+        api("com.github.salomonbrys.kotson:kotson:$kotson_version")
+    }
+}
+project(":jumpaku-commons-json-test") {
+    dependencies {
+        implementation(project(":jumpaku-commons-json"))
+    }
+}
+
+project(":jumpaku-commons-math") {
+    dependencies {
+        api(project(":jumpaku-commons-control"))
+        api("org.apache.commons:commons-math3:$commons_math3_version")
+    }
+}
+project(":jumpaku-commons-math-test") {
+    dependencies {
+        implementation(project(":jumpaku-commons-matcher"))
+        implementation(project(":jumpaku-commons-math"))
     }
 }
