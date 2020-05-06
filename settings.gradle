@@ -1,4 +1,14 @@
-rootProject.name = 'JumpakuCommons'
-include 'jumpaku-commons', 'jumpaku-commons-test'
+rootProject.name = "jumpaku-commons"
+include(
+        ":jumpaku-commons-matcher",
+        ":jumpaku-commons-control",
+        ":jumpaku-commons-control-test",
+        ":jumpaku-commons-history",
+        ":jumpaku-commons-history-test",
+        ":jumpaku-commons-json",
+        ":jumpaku-commons-json-test",
+        ":jumpaku-commons-math",
+        ":jumpaku-commons-math-test"
+)
 
 
