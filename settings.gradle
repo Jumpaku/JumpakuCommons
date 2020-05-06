@@ -1,4 +1,4 @@
-rootProject.name = 'JumpakuCommons'
-include 'jumpaku-commons', 'jumpaku-commons-test'
+rootProject.name = "JumpakuCommons"
+include("jumpaku-commons", "jumpaku-commons-test")
 
 

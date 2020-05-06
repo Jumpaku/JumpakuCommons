@@ -8,8 +8,8 @@ import jumpaku.commons.math.isEven
 import jumpaku.commons.math.isOdd
 import org.hamcrest.Matchers.*
 import org.junit.Assert.assertThat
+import org.junit.Assert.fail
 import org.junit.Test
-import org.junit.jupiter.api.assertThrows
 
 
 class OptionTest {
@@ -83,7 +83,14 @@ class OptionTest {
     fun testOrThrow() {
         println("OrThrow")
         assertThat(some.orThrow { IllegalStateException("NG") }, `is`(4))
-        assertThrows<IllegalStateException> { none.orThrow { IllegalStateException("NG") } }
+        try {
+            none.orThrow { IllegalStateException("NG") }
+            fail()
+        }catch (e: IllegalStateException) {
+
+        }catch (e: Throwable) {
+            fail()
+        }
     }
 
     @Test

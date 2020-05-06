@@ -6,7 +6,6 @@ import jumpaku.commons.test.math.closeTo
 import org.hamcrest.Matchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.assertTimeoutPreemptively
 import java.time.Duration
 import kotlin.random.Random
 
@@ -183,7 +182,7 @@ class MatrixTest {
             a.zip(e).forEach { (ae, ee) -> assertThat(ae, `is`(closeTo(ee))) }
         }
     }
-
+/*
     @Test
     fun testPerformance() {
         val r = 2000
@@ -209,4 +208,5 @@ class MatrixTest {
             println("    ${(System.nanoTime()-start)*1e-9}")
         }
     }
+*/
 }
