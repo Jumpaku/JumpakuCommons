@@ -10,4 +10,5 @@ jobs:
       - uses: actions/checkout@v2
       - run: 'docker-compose up --build deploy'
         env:
-          SUPER_SECRET: ${{ secrets.NEXUS_PASSWORD }}
+          NEXUS_USER: ${{ secrets.NEXUS_USER }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
