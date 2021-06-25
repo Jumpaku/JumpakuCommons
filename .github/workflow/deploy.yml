@@ -1,0 +1,13 @@
+name: deploy
+on:
+  push:
+    branches:
+      - release/*
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: 'docker-compose up --build deploy'
+        env:
+          SUPER_SECRET: ${{ secrets.NEXUS_PASSWORD }}
