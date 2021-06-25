@@ -10,7 +10,7 @@ buildscript {
 
 plugins {
     id("maven-publish")
-    id("org.jetbrains.kotlin.jvm") version "$kotlin_version"
+    id("org.jetbrains.kotlin.jvm").version("$kotlin_version")
 }
 
 // Common configuration
@@ -24,7 +24,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-        jcenter()
     }
 
     tasks.named("compileKotlin") {
